@@ -1,0 +1,239 @@
+- Philosphy of my config
+  - Features
+    - Terminal based
+      Because it's faster and more stable
+    - Literate config
+      Self-documented + easy to discover new packages
+    - Cross-platforms
+      Because you never know what job you will get
+    - VI style of editing
+      Because VI is unix compliant therefore universal
+    - Real time
+      Because that's how it's supposed to be
+      No need to be faster than that
+  - Editingo
+    - Visual
+      - When you can visualize it you have more power over it
+    - Interactive
+      - Don't edit in the dark
+      - It's a conversation
+    - Don't seek things let them come to you
+      - Inverse responsabilities
+  - Purpose
+    Have a lightweight and compatible config I could use on any hardware
+* App
+** Programming
+*** Languages
+**** Full-stack
+***** Web
+*** Utils
+**** Linting
+     #+BEGIN_SRC emacs-lisp
+       (use-package flycheck
+	 :defer t
+	 :diminish
+	 :hook ((prog-mode markdown-mode) . flycheck-mode)
+	 :custom
+	 (flycheck-global-modes
+	  '(not text-mode outline-mode fundamental-mode org-mode
+		diff-mode shell-mode eshell-mode term-mode))
+	 (flycheck-emacs-lisp-load-path 'inherit)
+	 (flycheck-indication-mode 'right-fringe)
+	 :init
+	 (use-package flycheck-grammarly :defer t)
+	 :config
+	 (when (fboundp 'define-fringe-bitmap)
+	   (define-fringe-bitmap 'flycheck-fringe-bitmap-double-arrow
+	     [16 48 112 240 112 48 16] nil nil 'center))
+	 (flycheck-add-mode 'javascript-eslint 'js-mode)
+	 (flycheck-add-mode 'typescript-tslint 'rjsx-mode))
+     #+END_SRC
+*** Programs
+**** TODO RestClient
+** Org-Mode
+*** Indentation
+    #+BEGIN_SRC emacs-lisp
+    (setq org-indent-indentation-per-level 1)
+(setq org-adapt-indentation nil)
+(setq org-hide-leading-stars 't)
+    #+END_SRC
+*** Hide details
+    #+BEGIN_SRC emacs-lisp
+    (setq org-hide-emphasis-markers t)
+
+    #+END_SRC
+*** Details
+    #+BEGIN_SRC emacs-lisp
+    (customize-set-variable 'org-blank-before-new-entry 
+                        '((heading . nil)
+                          (plain-list-item . nil)))
+(setq org-cycle-separator-lines 1)
+    #+END_SRC
+
+** TODO Magit
+* Editing
+** EVIL
+   #+BEGIN_SRC emacs-lisp
+     (use-package evil
+       :config
+       (evil-mode 1))
+   #+END_SRC
+** History
+   #+BEGIN_SRC emacs-lisp
+     (use-package undo-tree
+       :config
+       (global-undo-tree-mode 1))
+   #+END_SRC
+** Completion
+*** IVY
+    #+BEGIN_SRC emacs-lisp
+      (use-package ivy
+	:config
+	(ivy-mode 1))
+    #+END_SRC
+**** TODO IVY rich
+       (use-package ivy-rich
+	 :config
+	 (ivy-rich-mode 1))
+*** Snippets
+    #+BEGIN_SRC emacs-lisp
+    (use-package yasnippet
+  :diminish yas-minor-mode
+  :init
+  (use-package yasnippet-snippets :after yasnippet)
+  :hook ((prog-mode LaTeX-mode org-mode) . yas-minor-mode)
+  :bind
+  (:map yas-minor-mode-map ("C-c C-n" . yas-expand-from-trigger-key))
+  (:map yas-keymap
+        (("TAB" . smarter-yas-expand-next-field)
+         ([(tab)] . smarter-yas-expand-next-field)))
+  :config
+  (yas-reload-all)
+  (defun smarter-yas-expand-next-field ()
+    "Try to `yas-expand' then `yas-next-field' at current cursor position."
+    (interactive)
+    (let ((old-point (point))
+          (old-tick (buffer-chars-modified-tick)))
+      (yas-expand)
+      (when (and (eq old-point (point))
+                 (eq old-tick (buffer-chars-modified-tick)))
+        (ignore-errors (yas-next-field))))))
+    #+END_SRC
+*** Company
+    #+BEGIN_SRC emacs-lisp
+      (use-package company
+	:custom
+	(company-show-numbers t)
+	(company-idle-delay 0)
+	:config
+	(global-company-mode 1))
+    #+END_SRC
+*** TODO Abbrev
+*** TODO dabbrev
+** Navigation
+*** Jump
+   #+BEGIN_SRC emacs-lisp
+   (use-package avy
+       :custom
+       (global-set-key (kbd "C-:") 'avy-goto-word-1))
+   #+END_SRC
+*** TODO Outline
+*** TODO Window management
+*** Search
+**** swiper
+#+BEGIN_SRC emacs-lisp
+  (use-package swiper
+    :bind (("C-f" . swiper)))
+#+END_SRC
+
+**** ripgrep
+** Writing
+   - [[https://explog.in/notes/writingsetup.html][write-up]]
+*** Auto-fill
+    #+BEGIN_SRC emacs-lisp
+(add-hook
+ 'text-mode-hook
+ 'auto-fill-mode)
+    #+END_SRC
+*** Center text
+    #+BEGIN_SRC emacs-lisp
+(add-hook
+ 'text-mode-hook
+ 'olivetti-mode)
+    #+END_SRC
+* AESTHETIC
+** Modeline
+#+BEGIN_SRC emacs-lisp 
+  (use-package doom-modeline
+    :ensure t
+    :init (doom-modeline-mode 1))
+#+END_SRC
+** Dashboard
+   #+BEGIN_SRC emacs-lisp
+     (use-package dashboard
+       :ensure t
+       :config
+       (dashboard-setup-startup-hook))
+   #+END_SRC
+** Line numbers
+   #+BEGIN_SRC emacs-lisp
+   (display-line-numbers-mode 1)
+   (setq display-line-numbers-type 'relative)
+   #+END_SRC
+** Winum
+   #+BEGIN_SRC emacs-lisp
+     (use-package winum
+       :init
+       (setq winum-keymap
+	     (let ((map (make-sparse-keymap)))
+	       (define-key map (kbd "C-`") 'winum-select-window-by-number)
+	       (define-key map (kbd "C-²") 'winum-select-window-by-number)
+	       (define-key map (kbd "M-0") 'winum-select-window-0-or-10)
+	       (define-key map (kbd "M-1") 'winum-select-window-1)
+	       (define-key map (kbd "M-2") 'winum-select-window-2)
+	       (define-key map (kbd "M-3") 'winum-select-window-3)
+	       (define-key map (kbd "M-4") 'winum-select-window-4)
+	       (define-key map (kbd "M-5") 'winum-select-window-5)
+	       (define-key map (kbd "M-6") 'winum-select-window-6)
+	       (define-key map (kbd "M-7") 'winum-select-window-7)
+	       (define-key map (kbd "M-8") 'winum-select-window-8)
+	       map))
+       :config
+       (winum-mode 1))
+   #+END_SRC
+** Elegant emacs
+  #+BEGIN_SRC emacs-lisp
+(set-face-font 'default "Roboto Mono Light 10")
+  #+END_SRC
+*** Remove annoying stuff
+    #+BEGIN_SRC emacs-lisp
+ ;; Line cursor and no blink
+(set-default 'cursor-type  '(bar . 1))
+(blink-cursor-mode 0)
+
+;; No sound
+(setq visible-bell t)
+(setq ring-bell-function 'ignore)
+
+;; Paren mode is part of the theme
+(show-paren-mode t)
+
+;; No fringe but nice glyphs for truncated and wrapped lines
+(fringe-mode '(0 . 0))
+(defface fallback '((t :family "Fira Code Light"
+                       :inherit 'face-faded)) "Fallback")
+    #+END_SRC
+** Theme
+#+BEGIN_SRC emacs-lisp 
+(use-package doom-themes
+  :config
+  ;; Global settings (defaults)
+  (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
+        doom-themes-enable-italic t) ; if nil, italics is universally disabled
+  (load-theme 'doom-one t)
+  ;; or for tremacs users
+  (setq doom-themes-treemacs-theme "doom-colors") ; use the colorful treemacs theme
+  (doom-themes-treemacs-config)
+  ;; Corrects (and improves) org-mode's native fontification.
+  (doom-themes-org-config))
+#+END_SRC
