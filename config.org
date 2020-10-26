@@ -29,6 +29,11 @@
     :config
     (gcmh-mode 1))
 #+END_SRC
+** bind-file
+    #+BEGIN_SRC emacs-lisp
+      (defmacro bind-file (binding file)
+	`(global-set-key (kbd ,binding) (lambda () (interactive) (find-file ,file))))
+    #+END_SRC
 * App
 ** Programming
 *** Languages
@@ -132,6 +137,11 @@
          ("C-M-<f11>" . dap-step-out)
          ("<f7>" . dap-breakpoint-toggle))))
      #+END_SRC
+** Magit
+    #+BEGIN_SRC emacs-lisp
+      (use-package magit
+	:bind (("C-x g" . magit)))
+    #+END_SRC
 ** Org-Mode
 *** Indentation
     #+BEGIN_SRC emacs-lisp
@@ -151,10 +161,14 @@
                           (plain-list-item . nil)))
 (setq org-cycle-separator-lines 1)
     #+END_SRC
-** Magit
+*** Org-main
     #+BEGIN_SRC emacs-lisp
-      (use-package magit
-	:bind (("C-x g" . magit)))
+      (setq org-main-dir "~/../../Documents/ecole/org-mode/"
+	    org-main-file (concat org-main-dir "main.org"))
+    #+END_SRC
+**** bind file
+    #+BEGIN_SRC emacs-lisp
+      (bind-file "C-c o" org-main-file)
     #+END_SRC
 ** elfeed
     #+BEGIN_SRC emacs-lisp
@@ -163,11 +177,35 @@
       (use-package elfeed-org
 	:config
 	(defvar elfeed-feeds-alist
-	  '(("~/../../Documents/ecole/org-mode/elfeedMain.org"))))
+	  (list (concat org-main-dir "elfeedMain.org"))))
 
       (use-package elfeed-web)
     #+END_SRC
-* Editing
+** eww
+*** open-link-with-eww
+    #+BEGIN_SRC emacs-lisp
+      (setq browse-url-browser-function
+       '(("wikipedia\\.org" . eww-browse-url)
+	 ("github" . eww-browse-url) ;; TODO remoe the clutter
+	 ("." . browse-url-default-browser)))
+    #+END_SRC
+*** TODO improve github go directly to the README.md
+- CURRENT_URL + /blob/master/README.md
+  - User raw url
+    #+BEGIN_SRC emacs-lisp
+      (defun eww-goto-readme ()
+	(eww-browse-url (concat (plist-get eww-data :url) "/blob/master/README.md")))
+    #+END_SRC
+*** Preview
+**** Org-mode
+    #+BEGIN_SRC emacs-lisp
+      (use-package org-preview-html)
+    #+END_SRC
+**** Markdown
+    #+BEGIN_SRC emacs-lisp
+      (use-package markdown-preview-eww)
+    #+END_SRC
+* Editingk
 ** EVIL
    #+BEGIN_SRC emacs-lisp
      (use-package evil
@@ -312,14 +350,6 @@
     #+BEGIN_SRC emacs-lisp
       (global-set-key (kbd "C-x C-.") (lambda () (interactive) (find-file "~/.emacs.d/config.org")))
     #+END_SRC
-* Window management
-** Winner-mode
-   #+BEGIN_SRC emacs-lisp
-     (winner-mode t)
-     (evil-leader/set-key
-       "w u" 'winner-undo
-       "w r" 'winner-redo)
-   #+END_SRC
 * AESTHETIC
 ** Line numbers
    #+BEGIN_SRC emacs-lisp
