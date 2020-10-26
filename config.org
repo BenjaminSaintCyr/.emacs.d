@@ -21,11 +21,30 @@
       - Inverse responsabilities
   - Purpose
     Have a lightweight and compatible config I could use on any hardware
+* Better Emacs
+** Better garbage collection
+#+BEGIN_SRC emacs-lisp
+  (use-package gcmh
+  :ensure t
+    :config
+    (gcmh-mode 1))
+#+END_SRC
 * App
 ** Programming
 *** Languages
 **** Full-stack
 ***** Web
+**** Python
+     #+BEGIN_SRC emacs-lisp
+     (use-package python-mode
+  :ensure nil
+  :after flycheck
+  :mode "\\.py\\'"
+  :custom
+  (python-indent-offset 4)
+  (flycheck-python-pycompile-executable "python3")
+  (python-shell-interpreter "python3"))
+     #+END_SRC
 *** Utils
 **** Linting
      #+BEGIN_SRC emacs-lisp
@@ -50,6 +69,69 @@
      #+END_SRC
 *** Programs
 **** TODO RestClient
+*** LSP
+     #+BEGIN_SRC emacs-lisp
+       (use-package lsp-mode
+	 :defer t
+	 :commands lsp
+	 :custom
+	 (lsp-auto-guess-root nil)
+	 (lsp-prefer-flymake nil) ; Use flycheck instead of flymake
+	 (lsp-file-watch-threshold 2000)
+	 (read-process-output-max (* 1024 1024))
+	 (lsp-eldoc-hook nil)
+	 :bind (:map lsp-mode-map ("C-c C-f" . lsp-format-buffer))
+	 :hook ((java-mode python-mode go-mode
+		 js-mode js2-mode typescript-mode web-mode
+		 c-mode c++-mode objc-mode) . lsp))
+     #+END_SRC
+**** LSP UI
+     #+BEGIN_SRC emacs-lisp
+       (use-package lsp-ui
+	 :after lsp-mode
+	 :diminish
+	 :commands lsp-ui-mode
+	 :custom-face
+	 (lsp-ui-doc-background ((t (:background nil))))
+	 (lsp-ui-doc-header ((t (:inherit (font-lock-string-face italic)))))
+	 :bind
+	 (:map lsp-ui-mode-map
+	       ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
+	       ([remap xref-find-references] . lsp-ui-peek-find-references)
+	       ("C-c u" . lsp-ui-imenu)
+	       ("M-i" . lsp-ui-doc-focus-frame))
+	 (:map lsp-mode-map
+	       ("M-n" . forward-paragraph)
+	       ("M-p" . backward-paragraph))
+	 :custom
+	 (lsp-ui-doc-header t)
+	 (lsp-ui-doc-include-signature t)
+	 (lsp-ui-doc-border (face-foreground 'default))
+	 (lsp-ui-sideline-enable nil)
+	 (lsp-ui-sideline-ignore-duplicate t)
+	 (lsp-ui-sideline-show-code-actions nil)
+	 :config
+	 ;; Use lsp-ui-doc-webkit only in GUI
+	 (if (display-graphic-p)
+	     (setq lsp-ui-doc-use-webkit t))
+	 ;; WORKAROUND Hide mode-line of the lsp-ui-imenu buffer
+	 ;; https://github.com/emacs-lsp/lsp-ui/issues/243
+	 (defadvice lsp-ui-imenu (after hide-lsp-ui-imenu-mode-line activate)
+	   (setq mode-line-format nil)))
+     #+END_SRC
+**** DAP
+     #+BEGIN_SRC emacs-lisp
+(use-package dap-mode
+  :diminish
+  :bind
+  (:map dap-mode-map
+        (("<f12>" . dap-debug)
+         ("<f8>" . dap-continue)
+         ("<f9>" . dap-next)
+         ("<M-f11>" . dap-step-in)
+         ("C-M-<f11>" . dap-step-out)
+         ("<f7>" . dap-breakpoint-toggle))))
+     #+END_SRC
 ** Org-Mode
 *** Indentation
     #+BEGIN_SRC emacs-lisp
@@ -69,14 +151,37 @@
                           (plain-list-item . nil)))
 (setq org-cycle-separator-lines 1)
     #+END_SRC
+** Magit
+    #+BEGIN_SRC emacs-lisp
+      (use-package magit
+	:bind (("C-x g" . magit)))
+    #+END_SRC
+** elfeed
+    #+BEGIN_SRC emacs-lisp
+      (use-package elfeed) 
 
-** TODO Magit
+      (use-package elfeed-org
+	:config
+	(defvar elfeed-feeds-alist
+	  '(("~/../../Documents/ecole/org-mode/elfeedMain.org"))))
+
+      (use-package elfeed-web)
+    #+END_SRC
 * Editing
 ** EVIL
    #+BEGIN_SRC emacs-lisp
      (use-package evil
        :config
        (evil-mode 1))
+   #+END_SRC
+*** M-X
+   #+BEGIN_SRC emacs-lisp
+     ;; 
+   #+END_SRC
+*** evil-magit
+   #+BEGIN_SRC emacs-lisp
+     (use-package evil-magit
+       :ensure t)
    #+END_SRC
 ** History
    #+BEGIN_SRC emacs-lisp
@@ -85,16 +190,23 @@
        (global-undo-tree-mode 1))
    #+END_SRC
 ** Completion
-*** IVY
+*** IVY/counsel/swiper
+**** IVY
     #+BEGIN_SRC emacs-lisp
       (use-package ivy
 	:config
 	(ivy-mode 1))
     #+END_SRC
-**** TODO IVY rich
+***** TODO IVY rich
        (use-package ivy-rich
 	 :config
 	 (ivy-rich-mode 1))
+**** Counsel
+    #+BEGIN_SRC emacs-lisp
+	    (use-package counsel
+	      :config
+	      (evil-define-key 'normal 'global (kbd "<leader>SPC") 'counsel-M-x))
+    #+END_SRC
 *** Snippets
     #+BEGIN_SRC emacs-lisp
     (use-package yasnippet
@@ -143,7 +255,7 @@
 **** swiper
 #+BEGIN_SRC emacs-lisp
   (use-package swiper
-    :bind (("C-f" . swiper)))
+    :bind (("C-s" . swiper)))
 #+END_SRC
 
 **** ripgrep
@@ -161,20 +273,11 @@
  'text-mode-hook
  'olivetti-mode)
     #+END_SRC
+** File short cuts
+    #+BEGIN_SRC emacs-lisp
+      (global-set-key (kbd "C-x C-.") (lambda () (interactive) (find-file "~/.emacs.d/config.org")))
+    #+END_SRC
 * AESTHETIC
-** Modeline
-#+BEGIN_SRC emacs-lisp 
-  (use-package doom-modeline
-    :ensure t
-    :init (doom-modeline-mode 1))
-#+END_SRC
-** Dashboard
-   #+BEGIN_SRC emacs-lisp
-     (use-package dashboard
-       :ensure t
-       :config
-       (dashboard-setup-startup-hook))
-   #+END_SRC
 ** Line numbers
    #+BEGIN_SRC emacs-lisp
    (display-line-numbers-mode 1)
@@ -187,7 +290,6 @@
        (setq winum-keymap
 	     (let ((map (make-sparse-keymap)))
 	       (define-key map (kbd "C-`") 'winum-select-window-by-number)
-	       (define-key map (kbd "C-²") 'winum-select-window-by-number)
 	       (define-key map (kbd "M-0") 'winum-select-window-0-or-10)
 	       (define-key map (kbd "M-1") 'winum-select-window-1)
 	       (define-key map (kbd "M-2") 'winum-select-window-2)
@@ -202,38 +304,39 @@
        (winum-mode 1))
    #+END_SRC
 ** Elegant emacs
-  #+BEGIN_SRC emacs-lisp
-(set-face-font 'default "Roboto Mono Light 10")
-  #+END_SRC
-*** Remove annoying stuff
-    #+BEGIN_SRC emacs-lisp
- ;; Line cursor and no blink
-(set-default 'cursor-type  '(bar . 1))
-(blink-cursor-mode 0)
-
-;; No sound
-(setq visible-bell t)
-(setq ring-bell-function 'ignore)
-
-;; Paren mode is part of the theme
-(show-paren-mode t)
-
-;; No fringe but nice glyphs for truncated and wrapped lines
-(fringe-mode '(0 . 0))
-(defface fallback '((t :family "Fira Code Light"
-                       :inherit 'face-faded)) "Fallback")
-    #+END_SRC
-** Theme
+*** Theme
 #+BEGIN_SRC emacs-lisp 
+
 (use-package doom-themes
   :config
   ;; Global settings (defaults)
   (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
         doom-themes-enable-italic t) ; if nil, italics is universally disabled
-  (load-theme 'doom-one t)
+  (load-theme 'doom-solarized-dark t)
   ;; or for tremacs users
   (setq doom-themes-treemacs-theme "doom-colors") ; use the colorful treemacs theme
   (doom-themes-treemacs-config)
   ;; Corrects (and improves) org-mode's native fontification.
   (doom-themes-org-config))
+#+END_SRC
+*** Modeline
+*** Font
+#+BEGIN_SRC emacs-lisp 
+(set-face-font 'default "Roboto Mono Light 10")
+#+END_SRC
+*** Remove annoying things
+#+BEGIN_SRC emacs-lisp 
+(set-default 'cursor-type  '(bar . 1))
+(blink-cursor-mode 0)
+;; remove sound
+(setq visible-bell t)
+(setq ring-bell-function 'ignore)
+#+END_SRC
+*** Highligth
+#+BEGIN_SRC emacs-lisp
+(show-paren-mode t)
+#+END_SRC
+*** TODO Modeline
+#+BEGIN_SRC emacs-lisp
+
 #+END_SRC
