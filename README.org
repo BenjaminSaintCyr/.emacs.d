@@ -1,0 +1,4 @@
+- Philosphy of my config
+  - Visual
+  - Interactive
+  - Don't seek things let them come to you
