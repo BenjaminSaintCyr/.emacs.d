@@ -1,26 +1,3 @@
-- Philosphy of my config
-  - Features
-    - Terminal based
-      Because it's faster and more stable
-    - Literate config
-      Self-documented + easy to discover new packages
-    - Cross-platforms
-      Because you never know what job you will get
-    - VI style of editing
-      Because VI is unix compliant therefore universal
-    - Real time
-      Because that's how it's supposed to be
-      No need to be faster than that
-  - Editingo
-    - Visual
-      - When you can visualize it you have more power over it
-    - Interactive
-      - Don't edit in the dark
-      - It's a conversation
-    - Don't seek things let them come to you
-      - Inverse responsabilities
-  - Purpose
-    Have a lightweight and compatible config I could use on any hardware
 * Better Emacs
 ** Better garbage collection
 #+BEGIN_SRC emacs-lisp
@@ -34,6 +11,11 @@
       (defmacro bind-file (binding file)
 	`(global-set-key (kbd ,binding) (lambda () (interactive) (find-file ,file))))
     #+END_SRC
+** Hydra
+    #+BEGIN_SRC emacs-lisp
+      (use-package hydra)
+    #+END_SRC
+
 * App
 ** Programming
 *** Languages
@@ -49,6 +31,10 @@
   (python-indent-offset 4)
   (flycheck-python-pycompile-executable "python3")
   (python-shell-interpreter "python3"))
+     #+END_SRC
+**** octave
+     #+BEGIN_SRC emacs-lisp
+     (use-package ac-octave)
      #+END_SRC
 *** Utils
 **** Linting
@@ -276,9 +262,7 @@
 	 (ivy-rich-mode 1))
 **** Counsel
     #+BEGIN_SRC emacs-lisp
-	    (use-package counsel
-	      :config
-	      (evil-define-key 'normal 'global (kbd "<leader>SPC") 'counsel-M-x))
+	    (use-package counsel)
     #+END_SRC
 *** Snippets
     #+BEGIN_SRC emacs-lisp
@@ -318,12 +302,20 @@
 ** Navigation
 *** Jump
    #+BEGIN_SRC emacs-lisp
-   (use-package avy
+     (use-package avy
        :custom
-       (global-set-key (kbd "C-:") 'avy-goto-word-1))
+       (evil-leader/set-key 
+	 "j w" 'avy-goto-word-1
+	 "j l" 'avy-goto-line))
    #+END_SRC
 *** TODO Outline
-*** TODO Window management
+*** Window management
+   #+BEGIN_SRC emacs-lisp
+     ;; (defhydra hydra-zoom (global-map "")
+     ;;   "window"
+     ;;   ("v" split-window-rigth "vertical")
+     ;;   ("s" split-window-below "horizontal"))
+   #+END_SRC
 *** Search
 **** swiper
 #+BEGIN_SRC emacs-lisp
@@ -353,28 +345,24 @@
 * AESTHETIC
 ** Line numbers
    #+BEGIN_SRC emacs-lisp
-   (display-line-numbers-mode 1)
-   (setq display-line-numbers-type 'relative)
+     (setq display-line-numbers-type 'relative)
+     (add-hook 'prog-mode-hook 'display-line-numbers-mode)
    #+END_SRC
 ** Winum
    #+BEGIN_SRC emacs-lisp
-     (use-package winum
-       :init
-       (setq winum-keymap
-	     (let ((map (make-sparse-keymap)))
-	       (define-key map (kbd "C-`") 'winum-select-window-by-number)
-	       (define-key map (kbd "M-0") 'winum-select-window-0-or-10)
-	       (define-key map (kbd "M-1") 'winum-select-window-1)
-	       (define-key map (kbd "M-2") 'winum-select-window-2)
-	       (define-key map (kbd "M-3") 'winum-select-window-3)
-	       (define-key map (kbd "M-4") 'winum-select-window-4)
-	       (define-key map (kbd "M-5") 'winum-select-window-5)
-	       (define-key map (kbd "M-6") 'winum-select-window-6)
-	       (define-key map (kbd "M-7") 'winum-select-window-7)
-	       (define-key map (kbd "M-8") 'winum-select-window-8)
-	       map))
-       :config
-       (winum-mode 1))
+	  (use-package winum
+	    :config
+	    (winum-mode 1)
+	    (evil-leader/set-key 
+	      "0" 'winum-select-window-0-or-10
+	      "1" 'winum-select-window-1
+	      "2" 'winum-select-window-2
+	      "3" 'winum-select-window-3
+	      "4" 'winum-select-window-4
+	      "5" 'winum-select-window-5
+	      "6" 'winum-select-window-6
+	      "7" 'winum-select-window-7
+	      "8" 'winum-select-window-8))
    #+END_SRC
 ** Elegant emacs
 *** Theme
