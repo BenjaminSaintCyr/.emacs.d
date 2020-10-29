@@ -20,7 +20,6 @@
   (load bootstrap-file nil 'nomessage))
 ;;;; Integration with use-package
 (straight-use-package 'use-package)
-
 ;;; Better garbage colletion
 (use-package gcmh
 :straight t
