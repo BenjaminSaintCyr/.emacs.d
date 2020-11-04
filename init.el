@@ -22,8 +22,7 @@
 (straight-use-package 'use-package)
 ;;; Better garbage colletion
 (use-package gcmh
-:straight t
-:ensure t
+  :straight t
   :config
   (gcmh-mode 1))
 
