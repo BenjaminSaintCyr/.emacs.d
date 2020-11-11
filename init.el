@@ -1,5 +1,5 @@
 ;; -*- coding: utf-8; lexical-binding: t; -*-
-
+;; manage package archive
 (setq package-user-dir (expand-file-name "elpa" user-emacs-directory)
       package-archives
       '(("gnu"   . "https://elpa.gnu.org/packages/")
@@ -20,13 +20,18 @@
   (load bootstrap-file nil 'nomessage))
 ;;;; Integration with use-package
 (straight-use-package 'use-package)
+
 ;;; Better garbage colletion
 (use-package gcmh
   :straight t
   :config
   (gcmh-mode 1))
 
-(org-babel-load-file "~/.emacs.d/config.org")
+(org-babel-load-file (expand-file-name "config.org" user-emacs-directory))
+
+;; splash screen
+(find-file (if (not window-system) "~/.emacs.d/welcome.text" "~/.emacs.d/welcome.org"))
+(org-toggle-inline-images)
 
 
 (custom-set-variables
