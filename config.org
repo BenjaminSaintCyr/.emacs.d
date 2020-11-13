@@ -1,5 +1,4 @@
 * Better Emacs
-- Better defaults
 ** bind-file
     #+BEGIN_SRC emacs-lisp
       (defmacro bind-file (binding file)
@@ -589,10 +588,9 @@ Remove annoying things
 	  centaur-tabs-set-modified-marker t
 	  centaur-tabs-modified-marker "*")
     :bind
-    ;; (:map evil-normal-state-map
-	       ;; ("g t" . centaur-tabs-forward)
-	       ;; ("g T" . centaur-tabs-backward))
-	       )
+    (:map evil-normal-state-map
+	       ("g t" . centaur-tabs-forward)
+	       ("g T" . centaur-tabs-backward)))
 #+END_SRC
 *** Modeline
 #+BEGIN_SRC emacs-lisp
@@ -635,8 +633,19 @@ Remove annoying things
      (setq inhibit-startup-echo-area-message t)
      (setq warning-minimum-level :emergency)
    #+END_SRC
-(find-file (if (not window-system) "~/.emacs.d/welcome.text" "~/.emacs.d/welcome.org"))
-(org-toggle-inline-images)
+**** Dashboard
+   #+BEGIN_SRC emacs-lisp
+     (use-package dashboard
+       :straight t
+       :config
+       (dashboard-setup-startup-hook)
+       (setq dashboard-center-content t
+	     dashboard-banner-logo-title "simplex sigillum veri")
+       (setq dashboard-startup-banner
+	     (expand-file-name
+	      (if (not window-system) "welcome.txt"  "common-lisp.svg")
+	      (expand-file-name "assets" user-emacs-directory))))
+   #+END_SRC
 ** Text
 *** Font
 - for dyslexia

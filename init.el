@@ -29,14 +29,6 @@
 
 (org-babel-load-file (expand-file-name "config.org" user-emacs-directory))
 
-;; splash screen
-(find-file
- (expand-file-name
-  (if (not window-system) "welcome.text" "welcome.org")
-  (expand-file-name "assets" user-emacs-directory)))
-(org-toggle-inline-images)
-
-
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
