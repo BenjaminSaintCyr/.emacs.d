@@ -54,7 +54,6 @@
       (use-package no-littering
 	:straight t)
     #+END_SRC
-
 * Editing
 ** EVIL
    #+BEGIN_SRC emacs-lisp

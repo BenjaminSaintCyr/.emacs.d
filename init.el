@@ -30,7 +30,10 @@
 (org-babel-load-file (expand-file-name "config.org" user-emacs-directory))
 
 ;; splash screen
-(find-file (if (not window-system) "~/.emacs.d/welcome.text" "~/.emacs.d/welcome.org"))
+(find-file
+ (expand-file-name
+  (if (not window-system) "welcome.text" "welcome.org")
+  (expand-file-name "assets" user-emacs-directory)))
 (org-toggle-inline-images)
 
 

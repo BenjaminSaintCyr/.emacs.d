@@ -1,0 +1,4 @@
+*.el
+/elpa
+/straight
+/var
