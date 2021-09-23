@@ -77,7 +77,7 @@
 	 "s s" 'swiper
 	 "f f" 'counsel-find-file
 	 "f s" 'save-buffer
-	 "g g" 'magit
+	 "g s" 'magit
 	 "f U" 'undo-tree-visualize
 	 "b b" 'counsel-switch-buffer
 	 "b i" 'ibuffer
@@ -488,7 +488,7 @@ effective git blame
 #+END_SRC
 *** Org-main
 #+BEGIN_SRC emacs-lisp
-      (setq org-main-dir "~/../../Documents/ecole/org-mode/"
+      (setq org-main-dir "~/org-mode/"
 	    org-main-file (concat org-main-dir "main.org"))
 #+END_SRC
 **** bind file
@@ -640,16 +640,15 @@ Remove annoying things
        :config
        (dashboard-setup-startup-hook)
        (setq dashboard-center-content t
-	     dashboard-banner-logo-title "simplex sigillum veri")
+	     dashboard-banner-logo-title "Simplex Sigillum Veri")
        (setq dashboard-startup-banner
 	     (expand-file-name
-	      (if (not window-system) "welcome.txt"  "common-lisp.svg")
+	      (if (not window-system) "welcome.txt"  "common-lisp.png")
 	      (expand-file-name "assets" user-emacs-directory))))
    #+END_SRC
 ** Text
 *** Font
 - for dyslexia
-~(set-face-font 'default "OpenDyslexic 11")~
 #+BEGIN_SRC emacs-lisp 
   (set-face-font 'default "Roboto Mono Light 11")
 #+END_SRC
