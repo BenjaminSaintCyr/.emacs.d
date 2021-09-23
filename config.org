@@ -68,20 +68,21 @@
        #+END_SRC
 *** Keyboard bindings
 #+BEGIN_SRC emacs-lisp
-     (use-package evil-leader
-       :straight t
-       :config
-       (global-evil-leader-mode t)
-       (evil-leader/set-leader "<SPC>")
-       (evil-leader/set-key
-	 "s s" 'swiper
-	 "f f" 'counsel-find-file
-	 "f s" 'save-buffer
-	 "g s" 'magit
-	 "f U" 'undo-tree-visualize
-	 "b b" 'counsel-switch-buffer
-	 "b i" 'ibuffer
-	 "<SPC>" 'counsel-M-x))
+  (use-package evil-leader
+    :straight t
+    :config
+    (global-evil-leader-mode t)
+    (evil-leader/set-leader "<SPC>")
+    (evil-leader/set-key
+      "s s" 'swiper
+      "f f" 'counsel-find-file
+      "f s" 'save-buffer
+      "g s" 'magit
+      "f U" 'undo-tree-visualize
+      "b b" 'counsel-switch-buffer
+      "b i" 'ibuffer
+      "<SPC>" 'counsel-M-x
+      "'" 'eshell))
 #+END_SRC
 *** evil collection
 #+BEGIN_SRC emacs-lisp
@@ -386,72 +387,74 @@
 #+END_SRC
 *** TODO Eshell
 - [[http://www.modernemacs.com/post/custom-eshell/][inspo]]
+#+BEGIN_SRC emacs-lisp
   (require 'dash)
   (require 's)
 
   (defmacro with-face (STR &rest PROPS)
-  "Return STR propertized with PROPS."
-  `(propertize ,STR 'face (list ,@PROPS)))
+    "Return STR propertized with PROPS."
+    `(propertize ,STR 'face (list ,@PROPS)))
 
   (defmacro esh-section (NAME ICON FORM &rest PROPS)
-  "Build eshell section NAME with ICON prepended to evaled FORM with PROPS."
-  `(setq ,NAME
-  (lambda () (when ,FORM
-  (-> ,ICON
-  (concat esh-section-delim ,FORM)
-  (with-face ,@PROPS))))))
+    "Build eshell section NAME with ICON prepended to evaled FORM with PROPS."
+    `(setq ,NAME
+	   (lambda () (when ,FORM
+			(-> ,ICON
+			    (concat esh-section-delim ,FORM)
+			    (with-face ,@PROPS))))))
 
   (defun esh-acc (acc x)
-  "Accumulator for evaluating and concatenating esh-sections."
-  (--if-let (funcall x)
-  (if (s-blank? acc)
-  it
-  (concat acc esh-sep it))
-  acc))
+    "Accumulator for evaluating and concatenating esh-sections."
+    (--if-let (funcall x)
+	(if (s-blank? acc)
+	    it
+	  (concat acc esh-sep it))
+      acc))
 
   (defun esh-prompt-func ()
-  "Build `eshell-prompt-function'"
-  (concat esh-header
-  (-reduce-from 'esh-acc "" eshell-funcs)
-  "\n"
-  eshell-prompt-string))
-	  
+    "Build `eshell-prompt-function'"
+    (concat esh-header
+	    (-reduce-from 'esh-acc "" eshell-funcs)
+	    "\n"
+	    eshell-prompt-string))
 
 
-;; Separator between esh-sections
-(setq esh-sep "  ")  ; or " | "
 
-;; Separator between an esh-section icon and form
-(setq esh-section-delim " ")
+  ;; Separator between esh-sections
+  (setq esh-sep " | ")  ; or " | "
 
-;; Eshell prompt header
-(setq esh-header "\n ")  ; or "\n┌─"
+  ;; Separator between an esh-section icon and form
+  (setq esh-section-delim " ")
 
-;; Eshell prompt regexp and string. Unless you are varying the prompt by eg.
-;; your login, these can be the same.
-(setq eshell-prompt-regexp " ")   ; or "└─> "
-(setq eshell-prompt-string " ")   ; or "└─> "
+  ;; Eshell prompt header
+  (setq esh-header "\n┌─")  ; or "\n┌─"
 
-(esh-section esh-dir
-"\xf07c"  ;  (faicon folder)
-(abbreviate-file-name (eshell/pwd))
-'(:foreground "gold" :bold ultra-bold :underline t))
+  ;; Eshell prompt regexp and string. Unless you are varying the prompt by eg.
+  ;; your login, these can be the same.
+  (setq eshell-prompt-regexp "└─> ")   ; or "└─> "
+  (setq eshell-prompt-string "└─> ")   ; or "└─> "
 
-(esh-section esh-git
-"\xe907"  ;  (git icon)
-(magit-get-current-branch)
-'(:foreground "pink"))
+  (esh-section esh-dir
+	       "Directory"  ;  (faicon folder)
+	       (abbreviate-file-name (eshell/pwd))
+	       '(:foreground "gold" :bold ultra-bold :underline t))
 
-(esh-section esh-clock
-"\xf017"  ;  (clock icon)
-(format-time-string "%H:%M" (current-time))
-'(:foreground "forest green"))
+  (esh-section esh-git
+	       "Git"  ;  (git icon)
+	       (magit-get-current-branch)
+	       '(:foreground "pink"))
 
-;; Choose which eshell-funcs to enable
-(setq eshell-funcs (list esh-dir esh-git esh-clock))
+  (esh-section esh-clock
+	       "Time"  ;  (clock icon)
+	       (format-time-string "%H:%M" (current-time))
+	       '(:foreground "forest green"))
 
-;; Enable the new eshell prompt
-(setq eshell-prompt-function 'esh-prompt-func)
+  ;; Choose which eshell-funcs to enable
+  (setq eshell-funcs (list esh-dir esh-git esh-clock))
+
+  ;; Enable the new eshell prompt
+  (setq eshell-prompt-function 'esh-prompt-func)
+#+END_SRC
 *** GIT
 **** Magit
 #+BEGIN_SRC emacs-lisp
