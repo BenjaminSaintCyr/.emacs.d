@@ -548,6 +548,12 @@ effective git blame
 #+BEGIN_SRC emacs-lisp
 #+END_SRC
 *** TODO GNUS
+** PDF
+#+BEGIN_SRC emacs-lisp
+  (use-package pdf-tools
+    :straight t
+    :defer t) 
+#+END_SRC
 * AESTHETIC
 ** Sanity
 Remove annoying things
