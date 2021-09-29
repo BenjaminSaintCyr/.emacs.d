@@ -82,7 +82,13 @@
       "b b" 'counsel-switch-buffer
       "b i" 'ibuffer
       "<SPC>" 'counsel-M-x
-      "'" 'eshell))
+      "'" 'eshell
+      "c c" 'compile
+      ;; wm
+      "w s" 'split-window-below
+      "w v" 'split-window-horizontally
+      "q q" 'save-buffers-kill-emacs
+      ))
 #+END_SRC
 *** evil collection
 #+BEGIN_SRC emacs-lisp
@@ -136,6 +142,11 @@
 **** Counsel
 #+BEGIN_SRC emacs-lisp
       (use-package counsel
+	:straight t)
+#+END_SRC
+***** counsel tramp
+#+BEGIN_SRC emacs-lisp
+      (use-package counsel-tramp
 	:straight t)
 #+END_SRC
 *** Snippets
@@ -267,6 +278,29 @@
 	 :config
 	 (add-to-list 'auto-mode-alist '("\\.m\\'" . octave-maybe-mode)))
 #+END_SRC
+**** C-C++
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'c-mode-hook 'lsp)
+  (add-hook 'c++-mode-hook 'lsp)
+  (setq lsp-clangd-binary-path "~/.guix-profile/bin/clangd")
+#+END_SRC
+**** Promela
+#+BEGIN_SRC emacs-lisp
+  (use-package promela-mode
+    :straight (promela-mode :type git :host github :repo "rudi/promela-mode")
+    ;;:after flycheck
+    ;;:hook (company-mode . flycheck-mode)
+    :config
+    (flycheck-define-checker promela
+      "A Promela syntax checker using the Promela compiler"
+      :command ("spin" "-C" source)
+      :error-patterns
+      ((error line-start "spin: " (file-name) ":" line ", Error: " (message) line-end))
+      :modes promela-mode)
+    ;; (flycheck-mode)
+    ;; (flycheck-select-checker 'promela)
+    )
+#+END_SRC
 *** Utils
 **** Linting
 #+BEGIN_SRC emacs-lisp
@@ -329,7 +363,7 @@
 #+END_SRC
 *** Programs
 **** TODO RestClient
-*** TODO COMMENT LSP
+*** TODO LSP
 #+BEGIN_SRC emacs-lisp
        (use-package lsp-mode
 	 :straight t
@@ -435,17 +469,17 @@
   (setq eshell-prompt-string "└─> ")   ; or "└─> "
 
   (esh-section esh-dir
-	       "Directory"  ;  (faicon folder)
+	       ""  ;  (faicon folder)
 	       (abbreviate-file-name (eshell/pwd))
 	       '(:foreground "gold" :bold ultra-bold :underline t))
 
   (esh-section esh-git
-	       "Git"  ;  (git icon)
+	       "";  (git icon)
 	       (magit-get-current-branch)
 	       '(:foreground "pink"))
 
   (esh-section esh-clock
-	       "Time"  ;  (clock icon)
+	       "";  (clock icon)
 	       (format-time-string "%H:%M" (current-time))
 	       '(:foreground "forest green"))
 
@@ -499,9 +533,18 @@ effective git blame
       (bind-file "C-c o" org-main-file)
 #+END_SRC
 *** Agenda
+#+BEGIN_SRC emacs-lisp
+(setq org-angenda-files (list org-main-file))
+#+END_SRC
 (use-package elegant-agenda-mode
 :straight (elegant-agenda-mode :type git :host github :repo "justincbarclay/elegant-agenda-mode")
 :hook org-agenda-mode-hook)
+*** TODOs
+#+BEGIN_SRC emacs-lisp
+(setq org-todo-keywords
+      '((sequence "TODO" "DOING" "REVIEW" "|" "DONE" "CANCELED")
+        (sequence "BUG" "DEBUG" "|" "SOLVED")))
+#+END_SRC
 ** Reader
 *** elfeed
 #+BEGIN_SRC emacs-lisp
@@ -545,14 +588,30 @@ effective git blame
 #+END_SRC
 ** Communications
 *** ERC
-#+BEGIN_SRC emacs-lisp
-#+END_SRC
-*** TODO GNUS
+*** GNUS
 ** PDF
 #+BEGIN_SRC emacs-lisp
   (use-package pdf-tools
     :straight t
     :defer t) 
+#+END_SRC
+* System Management
+** GUIX
+#+BEGIN_SRC emacs-lisp
+  (use-package geiser-guile
+	 :straight t)
+    (use-package guix
+	 :straight t
+  :after geiser-guile)
+#+END_SRC
+** Docker
+#+BEGIN_SRC emacs-lisp
+  (use-package docker
+    :straight t)
+  (use-package dockerfile-mode
+    :straight t)
+  (use-package docker-tramp
+    :straight t)
 #+END_SRC
 * AESTHETIC
 ** Sanity
